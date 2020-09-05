@@ -8,19 +8,19 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\Robert\\.nuget\\packages\\": {}
+    "C:\\Users\\RSmit\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\NJIT MSCS\\cs634-midterm\\cs634-midterm.csproj",
+      "projectUniqueName": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
       "projectName": "cs634-midterm",
-      "projectPath": "D:\\NJIT MSCS\\cs634-midterm\\cs634-midterm.csproj",
-      "packagesPath": "C:\\Users\\Robert\\.nuget\\packages\\",
-      "outputPath": "D:\\NJIT MSCS\\cs634-midterm\\obj\\",
+      "projectPath": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
+      "packagesPath": "C:\\Users\\RSmit\\.nuget\\packages\\",
+      "outputPath": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Robert\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\RSmit\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
@@ -56,7 +56,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
       }
     }
   }
