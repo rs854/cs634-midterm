@@ -18,34 +18,46 @@ namespace cs634_midterm
             // Calculate support of starting items
             startingItemSets = GetFrequentItemSets(startingItemSets, transactions, 0);
 
-            double minSupport = 0.15;
+            double minSupport = 0.25;
             List<ItemSet> frequentItemSets = new List<ItemSet>();
 
             frequentItemSets = GetFrequentItemSets(startingItemSets, transactions, minSupport);
-            // PrintItemSets(frequentItemSets);
+            PrintItemSets(frequentItemSets);
             var joined = JoinItemSets(frequentItemSets);
-            
+
 
             while (frequentItemSets.Count() > 0)
             {
                 frequentItemSets = GetFrequentItemSets(joined, transactions, minSupport);
-                PrintAssociationRules(frequentItemSets, startingItemSets);
+                PrintAssociationRules(frequentItemSets, transactions);
                 // PrintItemSets(frequentItemSets);
                 joined = JoinItemSets(frequentItemSets);
             }
         }
 
-        private static void PrintAssociationRules(IEnumerable<ItemSet> joined, IEnumerable<ItemSet> startingItemSets)
+        private static void PrintAssociationRules(IEnumerable<ItemSet> joined, string[] transactions)
         {
             foreach (var itemSet in joined)
             {
-                var firstItem = itemSet.items.First();
-                var restOfItems = itemSet.items.Skip(1).ToList();
-                var supportOfFirstItem = startingItemSets.Where(itemSet => itemSet.items.Contains(firstItem))
-                                                            .Select(itemSet => itemSet.support)
-                                                            .FirstOrDefault();
-                var confidence = itemSet.support / supportOfFirstItem;
-                System.Console.WriteLine($"{firstItem} -> {String.Join(",", restOfItems)}\t{itemSet.support}\t{confidence}");
+                int firstGroupSize = 1;
+
+                while (firstGroupSize < itemSet.items.Count())
+                {
+                    var firstGroupItems = itemSet.items.Take(firstGroupSize).ToList();
+                    var restOfItems = itemSet.items.Skip(firstGroupSize).ToList();
+
+                    var firstGroupItemSet = new List<ItemSet>() { new ItemSet() { items = firstGroupItems } };
+
+                    var supportOfFirstGroup = GetItemSetsSupport(firstGroupItemSet, transactions).First().support;
+
+                    // var supportOfFirstGroup = startingItemSets.Where(itemSet => itemSet.items.Contains(firstItem))
+                    //                                             .Select(itemSet => itemSet.support)
+                    //                                             .FirstOrDefault();
+                    var confidence = itemSet.support / supportOfFirstGroup;
+                    System.Console.WriteLine($"{String.Join(",", firstGroupItems)} -> {String.Join(",", restOfItems)}\t{itemSet.support}\t{confidence}");
+
+                    firstGroupSize = firstGroupSize + 1;
+                }
             }
         }
 
@@ -64,16 +76,24 @@ namespace cs634_midterm
 
         private static List<ItemSet> GetFrequentItemSets(IEnumerable<ItemSet> itemSets, string[] transactions, double minSupport)
         {
+            IEnumerable<ItemSet> itemSetsWithSupport = GetItemSetsSupport(itemSets, transactions);
+
+            return itemSetsWithSupport.Where(itemSet => itemSet.support >= minSupport).ToList();
+        }
+
+        private static IEnumerable<ItemSet> GetItemSetsSupport(IEnumerable<ItemSet> itemSets, string[] transactions)
+        {
             double numTransactions = transactions.Count();
 
-            return itemSets.Select(itemSet => new ItemSet()
+            var itemSetsWithSupport = itemSets.Select(itemSet => new ItemSet()
             {
                 support = transactions.Where(t => !itemSet.items
                                                     .Except(t.Split(","))
                                                     .Any())
                                                     .Count() / numTransactions,
                 items = itemSet.items,
-            }).Where(itemSet => itemSet.support >= minSupport).ToList();
+            });
+            return itemSetsWithSupport;
         }
 
         static IEnumerable<ItemSet> JoinItemSets(IEnumerable<ItemSet> itemSets)
@@ -85,10 +105,10 @@ namespace cs634_midterm
             {
                 foreach (var item in items)
                 {
-                    // string a = itemSet.items.First();
-                    // string b = itemSet2.items.First();
+                    // Check that the item is not a duplicate
                     if (!itemSet.items.Contains(item))
                     {
+                        // Tentitively add the new item to the existing items
                         var joinedItems = new List<string>();
                         foreach (var i in itemSet.items)
                         {
@@ -96,6 +116,7 @@ namespace cs634_midterm
                         }
                         joinedItems.Add(item);
 
+                        // Check that the new group doesn't already exist in a different order
                         if (joinedItemSets.Select(jis => jis.items.Except(joinedItems).Any()).All(o => o))
                         {
                             joinedItemSets.Add(new ItemSet()
