@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace cs634_midterm
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
             string[] items = File.ReadAllLines("items.txt");
-            string[] transactions = File.ReadAllLines("transactions\\1.txt");
+            string[] transactions = File.ReadAllLines("transactions\\2.txt");
             List<ItemSet> startingItemSets = items.Select(item => new ItemSet()
             {
                 items = new List<string>() { item }
@@ -18,9 +18,17 @@ namespace cs634_midterm
             // Calculate support of starting items
             startingItemSets = GetFrequentItemSets(startingItemSets, transactions, 0);
 
-            double minSupport = 0.25;
+            // Get user input parameters
+            // Console.WriteLine("Enter min support:");
+            // double minSupport = Convert.ToDouble(Console.ReadLine());
+            // Console.WriteLine("Enter min confidence:");
+            // double minConfidence = Convert.ToDouble(Console.ReadLine());
+            double minSupport = 0.4;
+            double minConfidence = 0.8;
+
             List<ItemSet> frequentItemSets = new List<ItemSet>();
 
+            Console.WriteLine("Iteration 1");
             frequentItemSets = GetFrequentItemSets(startingItemSets, transactions, minSupport);
             PrintItemSets(frequentItemSets);
             var joined = JoinItemSets(frequentItemSets);
@@ -29,48 +37,71 @@ namespace cs634_midterm
             while (frequentItemSets.Count() > 0)
             {
                 frequentItemSets = GetFrequentItemSets(joined, transactions, minSupport);
-                PrintAssociationRules(frequentItemSets, transactions);
-                // PrintItemSets(frequentItemSets);
+                PrintItemSets(frequentItemSets);
+                PrintAssociationRules(frequentItemSets, transactions, minConfidence);
                 joined = JoinItemSets(frequentItemSets);
             }
         }
 
-        private static void PrintAssociationRules(IEnumerable<ItemSet> joined, string[] transactions)
+        private static void PrintAssociationRules(IEnumerable<ItemSet> joined, string[] transactions, double minConfidence)
         {
-            foreach (var itemSet in joined)
+            if (joined.Count() > 0)
             {
-                int firstGroupSize = 1;
+                Table t = new Table(new List<string>() { "Association Rule", "Support", "Confidence" });
 
-                while (firstGroupSize < itemSet.items.Count())
+                foreach (var itemSet in joined)
                 {
-                    var firstGroupItems = itemSet.items.Take(firstGroupSize).ToList();
-                    var restOfItems = itemSet.items.Skip(firstGroupSize).ToList();
+                    // Shift arrow to the right
+                    for (int firstGroupSize = 1; firstGroupSize < itemSet.items.Count(); firstGroupSize++)
+                    {
+                        // Shift elements to the left
+                        for (int j = 0; j < itemSet.items.Count(); j++)
+                        {
+                            itemSet.items = RotateItems(itemSet);
 
-                    var firstGroupItemSet = new List<ItemSet>() { new ItemSet() { items = firstGroupItems } };
+                            // Split items at arrow position
+                            var firstGroupItems = itemSet.items.Take(firstGroupSize).ToList();
+                            var restOfItems = itemSet.items.Skip(firstGroupSize).ToList();
 
-                    var supportOfFirstGroup = GetItemSetsSupport(firstGroupItemSet, transactions).First().support;
+                            var firstGroupItemSet = new List<ItemSet>() { new ItemSet() { items = firstGroupItems } };
 
-                    // var supportOfFirstGroup = startingItemSets.Where(itemSet => itemSet.items.Contains(firstItem))
-                    //                                             .Select(itemSet => itemSet.support)
-                    //                                             .FirstOrDefault();
-                    var confidence = itemSet.support / supportOfFirstGroup;
-                    System.Console.WriteLine($"{String.Join(",", firstGroupItems)} -> {String.Join(",", restOfItems)}\t{itemSet.support}\t{confidence}");
+                            var supportOfFirstGroup = GetItemSetsSupport(firstGroupItemSet, transactions).First().support;
 
-                    firstGroupSize = firstGroupSize + 1;
+                            var confidence = itemSet.support / supportOfFirstGroup;
+                            if (confidence >= minConfidence)
+                            {
+                                string rule = $"{firstGroupItems.ItemSetToString()} --> {restOfItems.ItemSetToString()}";
+
+                                t.Rows.Add(new List<string>() { rule, itemSet.support.ToString("0.000"), confidence.ToString("0.000") });
+                            }
+                        }
+                    }
                 }
+
+                t.Print();
+                Console.WriteLine("");
             }
+        }
+
+        private static string[] RotateItems(ItemSet itemSet)
+        {
+            return itemSet.items.Skip(1).Concat(itemSet.items.Take(1)).ToArray();
         }
 
         private static void PrintItemSets(List<ItemSet> frequentItemSets)
         {
             if (frequentItemSets.Count() > 0)
             {
+
+                Table t = new Table(new List<string>() { "Frequent Items", "Support" });
+
                 foreach (var itemSet in frequentItemSets)
                 {
-                    System.Console.WriteLine($"{String.Join(",", itemSet.items)}: {itemSet.support}");
+                    t.Rows.Add(new List<string>() { itemSet.ToString(), itemSet.support.ToString("0.000") });
                 }
 
-                System.Console.WriteLine("===================");
+                t.Print();
+                Console.WriteLine("");
             }
         }
 
@@ -135,11 +166,37 @@ namespace cs634_midterm
         // {
 
         // }
+
+        public static string ItemSetToString(this List<string> items)
+        {
+            if (items != null && items.Count() > 0)
+            {
+                return "{ " + String.Join(", ", items) + " }";
+            }
+            else
+            {
+                return "{}";
+            }
+        }
     }
+
+
 
     class ItemSet
     {
         public double support { get; set; }
         public IEnumerable<string> items { get; set; }
+
+        public override string ToString()
+        {
+            if (items != null && items.Count() > 0)
+            {
+                return "{ " + String.Join(", ", items) + " }";
+            }
+            else
+            {
+                return base.ToString();
+            }
+        }
     }
 }
