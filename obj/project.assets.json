@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
+      "projectUniqueName": "C:\\Users\\RSmit\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
       "projectName": "cs634-midterm",
-      "projectPath": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
+      "projectPath": "C:\\Users\\RSmit\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\cs634-midterm.csproj",
       "packagesPath": "C:\\Users\\RSmit\\.nuget\\packages\\",
-      "outputPath": "D:\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\obj\\",
+      "outputPath": "C:\\Users\\RSmit\\OneDrive\\Documents\\NJIT MSCS\\CS634\\cs634-midterm\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\RSmit\\AppData\\Roaming\\NuGet\\NuGet.Config"
